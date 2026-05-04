@@ -1,0 +1,2 @@
+{"role":"tool","createdAt":"2026-05-01T10:02:00.000Z","content":"read docs/PRD.md and found local-first requirements","tools":[{"name":"read"}]}
+{"role":"assistant","createdAt":"2026-05-01T10:03:00.000Z","content":"The memory manifest should include citations for every normalized message."}
