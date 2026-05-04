@@ -1,79 +1,43 @@
 # Contributing
 
-Thanks for helping improve `memoryharbor`.
+Thanks for helping keep the harbor useful and safe.
 
-This project values small, reviewable contributions with clear verification.
+## Development setup
 
-## Issues
-
-Before opening an issue:
-
-- Search existing issues.
-- Confirm the issue applies to `memoryharbor`.
-- Include enough context for maintainers to understand or reproduce the request.
-
-Bug reports should include:
-
-- What happened.
-- What you expected.
-- Steps to reproduce.
-- Relevant logs, screenshots, or files.
-- The smallest verification step that demonstrates the issue.
-
-Feature requests should include:
-
-- The use case.
-- Why the current project does not solve it.
-- Risks or compatibility concerns.
-- Suggested files or behavior that may need to change.
-
-## Pull Requests
-
-Pull requests should:
-
-- Focus on one reviewable intent.
-- Use a branch.
-- Follow Conventional Commits.
-- Include tests or verification appropriate to the change.
-- Update documentation when behavior or usage changes.
-- Avoid unrelated formatting or dependency churn.
-- Avoid secrets, private contact details, and project-specific sensitive information.
-
-## Review Pack
-
-Use this format for meaningful changes:
-
-```md
-## Review Pack
-Repo:
-Branch:
-PR:
-Task:
-Status: done / blocked / needs review
-Summary:
-Commits:
-Files changed:
-Verification:
-Risk level:
-Rollback plan:
-Human decision needed:
-Next recommended task:
+```bash
+git clone https://github.com/rogerchappel/memoryharbor.git
+cd memoryharbor
+npm install
+npm test
+npm run smoke
 ```
 
-## Verification
+## Pull request expectations
 
-Every contribution should include verification.
+- Link the PR to an item in `docs/TASKS.md` or add a new task in the same PR.
+- Keep changes small enough to review.
+- Add or update fixture-backed tests for behavior changes.
+- Run the validation commands listed below.
+- Call out any change to privacy, redaction, network behavior, or generated output shape.
 
-Examples:
+## Validation
 
-- Documentation: inspect rendered Markdown or review the diff.
-- Tests: run the targeted test command.
-- Types: run the project typecheck.
-- Build: run the smallest build command that covers the change.
-- Manual QA: provide exact steps and observed result.
+```bash
+npm test
+npm run check
+npm run build
+npm run smoke
+bash scripts/validate.sh
+```
 
-If verification cannot be run, explain why and provide the exact command maintainers should run.
+## Fixture guidance
 
-## Maintainer Review
+Use synthetic transcripts only. Do not commit real chat logs, credentials, emails, customer names, or private repository output. If a bug needs a sensitive shape, reduce it to the smallest fake fixture that reproduces the issue.
 
-Maintainers may request narrower scope, clearer verification, additional tests, or safer defaults before merging.
+## Design principles
+
+- Local-first beats clever.
+- Deterministic output beats magic.
+- Citations beat vibes.
+- Forgetting must be understandable.
+- Agents and humans should use the same CLI surface.
