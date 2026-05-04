@@ -1,0 +1,34 @@
+{
+  "project": "memoryharbor",
+  "role": "local-first memory pack CLI",
+  "lanes": [
+    {
+      "id": "core-ingest",
+      "owner": "maintainer",
+      "paths": ["src/parse.js", "src/parser-json.js", "src/parser-text.js", "src/manifest.js", "src/redact.js"]
+    },
+    {
+      "id": "cli-ux",
+      "owner": "maintainer",
+      "paths": ["src/cli.js", "src/args.js", "src/help.js", "scripts/smoke.sh"]
+    },
+    {
+      "id": "docs-trust",
+      "owner": "maintainer",
+      "paths": ["README.md", "SECURITY.md", "CONTRIBUTING.md", "docs/**"]
+    }
+  ],
+  "requiredChecks": [
+    "npm test",
+    "npm run check",
+    "npm run build",
+    "npm run smoke",
+    "bash scripts/validate.sh"
+  ],
+  "safety": {
+    "networkCalls": false,
+    "telemetry": false,
+    "redactionDefault": true,
+    "deleteBehavior": "user removes output directory explicitly"
+  }
+}
