@@ -1,58 +1,36 @@
 # Security Policy
 
-## Supported Versions
+MemoryHarbor handles local transcripts and tool logs, so treat every input as potentially sensitive.
 
-Replace this section with the supported versions for `memoryharbor`.
+## Supported versions
 
-Example:
-
-```md
 | Version | Supported |
 | --- | --- |
-| .x | Yes |
-| < .0 | No |
-```
+| 0.1.x | Yes |
 
-If the project does not publish versioned releases yet, say that clearly.
+## Local-first guarantees
 
-## Reporting a Vulnerability
+The MVP does not make network calls, start background services, collect telemetry, or publish generated memory packs. The CLI reads local files and writes local JSON/Markdown to the output directory you choose.
 
-Please do not report suspected vulnerabilities in public issues, pull requests, or discussions.
+## Redaction
 
-Ask maintainers for the private security reporting path before sharing details.
+Default redaction replaces common emails, token-looking strings, and env-style secrets before parsing. Redaction is a safety net, not a guarantee. Review generated packs before committing, sharing, or attaching them to issues.
 
-If no private reporting path exists yet, ask maintainers through public project channels for a private reporting path. Do not include exploit details, secrets, personal data, or sensitive technical details in public messages.
+## Reporting vulnerabilities
 
-## What to Include
+Please open a GitHub security advisory or a private issue with:
 
-When a private reporting path is available, include:
+- the affected version/commit,
+- reproduction steps using minimal fixtures,
+- expected vs actual behavior,
+- whether generated output exposed sensitive content.
 
-- A clear description of the issue.
-- Affected versions, files, packages, workflows, or configuration.
-- Steps to reproduce, proof of concept, or attack scenario when safe to share.
-- Potential impact.
-- Suggested mitigation, if known.
+Do not include real secrets in reports. Use synthetic fixtures.
 
-## Response Expectations
+## Maintainer response target
 
-Maintainers review good-faith reports as capacity allows.
+Best effort for an early OSS project:
 
-Do not imply paid support, guaranteed response times, guaranteed fixes, or service-level agreements unless `memoryharbor` explicitly provides them.
-
-## Scope
-
-In scope:
-
-- Vulnerabilities in memoryharbor.
-- Insecure default configuration shipped by this project.
-- CI, release, or dependency guidance maintained by this project.
-
-Out of scope:
-
-- General support requests.
-- Requests for guaranteed maintenance timelines.
-- Issues in unrelated downstream projects.
-
-## Disclosure
-
-Coordinate disclosure with maintainers before publishing vulnerability details.
+- acknowledge within 7 days,
+- patch or document mitigation within 30 days for confirmed issues,
+- credit reporters when requested.
