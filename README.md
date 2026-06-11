@@ -93,6 +93,13 @@ node src/cli.js inspect fixtures/sample --output .tmp/manual --query citations
 - [Security](SECURITY.md)
 - [Contributing](CONTRIBUTING.md)
 
+## Package contents
+
+The npm package allowlist includes the runtime files plus the public support
+documents needed for release review: `README.md`, `LICENSE`, `SECURITY.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`.
+Run `npm run package:smoke` or `npm pack --dry-run` before publishing to
+confirm those files are still present in the tarball.
+
 ## License
 
 MIT
