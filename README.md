@@ -103,3 +103,9 @@ confirm those files are still present in the tarball.
 ## License
 
 MIT
+
+## Verification
+
+Run the release-readiness checks that match this package before publishing or opening a release PR.
+
+- `npm run release:check` - run the full release gate
