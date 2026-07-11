@@ -61,6 +61,15 @@ console.log(hits[0].citation);
 ## Input shapes
 
 JSON transcripts can use `messages` with `role`, `content`, `createdAt`, and `toolCalls` fields. JSONL files are one message per line. Markdown/text files split on blank lines and infer a role from prefixes like `user:` or `assistant:`.
+## CLI Help Smoke
+
+Confirm the packaged command starts and prints its help text before relying on a release tarball or downstream automation:
+
+```bash
+node ./src/cli.js --help
+```
+
+The command should exit successfully, print the available options, and avoid reading project files or contacting external services.
 
 ## Safety boundaries
 
