@@ -1,12 +1,20 @@
 #!/usr/bin/env node
 import { promises as fs } from 'node:fs';
+import { createRequire } from 'node:module';
 import { inspect } from './inspect.js';
 import { searchManifest } from './search.js';
 import { parseArgs } from './args.js';
 import { helpText } from './help.js';
 
+const require = createRequire(import.meta.url);
+const { version } = require('../package.json');
+
 async function main() {
   const { command, options } = parseArgs(process.argv.slice(2));
+  if (command === '--version' || command === '-v' || options.version) {
+    process.stdout.write(`${version}\n`);
+    return;
+  }
   if (options.help || command === 'help' || command === '--help') {
     process.stdout.write(helpText());
     return;
