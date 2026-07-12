@@ -4,6 +4,7 @@ export function helpText() {
 Usage:
   memoryharbor inspect <input-dir> --output <output-dir> [--query "term"]
   memoryharbor search <manifest.json> --query "term" [--json]
+  memoryharbor --version
   memoryharbor --help
 
 Commands:

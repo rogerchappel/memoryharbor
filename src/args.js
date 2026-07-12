@@ -12,6 +12,7 @@ export function parseArgs(argv) {
     else if (arg === '--no-redact') options.redact = false;
     else if (arg === '--json') options.json = true;
     else if (arg === '--help' || arg === '-h') options.help = true;
+    else if (arg === '--version' || arg === '-v') options.version = true;
     else if (arg.startsWith('-')) throw new MemoryHarborError(`Unknown option: ${arg}`);
     else options._.push(arg);
   }

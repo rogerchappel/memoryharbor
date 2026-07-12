@@ -67,9 +67,10 @@ Confirm the packaged command starts and prints its help text before relying on a
 
 ```bash
 node ./src/cli.js --help
+node ./src/cli.js --version
 ```
 
-The command should exit successfully, print the available options, and avoid reading project files or contacting external services.
+Both commands should exit successfully without reading project files or contacting external services.
 
 ## Safety boundaries
 
