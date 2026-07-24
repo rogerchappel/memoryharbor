@@ -58,6 +58,10 @@ const hits = searchManifest(manifest, 'forgetting policy');
 console.log(hits[0].citation);
 ```
 
+The output directory may be the input directory or live beneath it. MemoryHarbor
+automatically excludes its generated manifest and report (or the nested output
+directory) so repeated inspections do not re-ingest prior output.
+
 ## Input shapes
 
 JSON transcripts can use `messages` with `role`, `content`, `createdAt`, and `toolCalls` fields. JSONL files are one message per line. Markdown/text files split on blank lines and infer a role from prefixes like `user:` or `assistant:`.

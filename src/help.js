@@ -13,5 +13,6 @@ Commands:
 
 Safety:
   Local files only. No network calls. Redacts common emails/tokens by default.
+  Output inside the input directory is excluded from inspection.
 `;
 }
