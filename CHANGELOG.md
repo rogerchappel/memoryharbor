@@ -11,6 +11,10 @@ format and uses semantic versioning when versioned releases are published.
 
 - Initial project setup.
 
+### Fixed
+
+- Exclude generated output nested within the input directory from inspection.
+
 ## Release Links
 
 - Unreleased:
