@@ -24,15 +24,21 @@ export async function writeJson(filePath, value) {
   await fs.writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
-export async function walkFiles(root) {
+export async function walkFiles(root, { excludedDirectories = [], excludedFiles = [] } = {}) {
   const out = [];
+  const directoryExclusions = new Set(excludedDirectories.map((entry) => path.resolve(entry)));
+  const fileExclusions = new Set(excludedFiles.map((entry) => path.resolve(entry)));
   async function visit(current) {
     const entries = await fs.readdir(current, { withFileTypes: true });
     entries.sort((a, b) => a.name.localeCompare(b.name));
     for (const entry of entries) {
       const full = path.join(current, entry.name);
-      if (entry.isDirectory()) await visit(full);
-      else if (entry.isFile() && supportedInputExtensions.has(path.extname(entry.name).toLowerCase())) out.push(full);
+      if (entry.isDirectory() && !directoryExclusions.has(path.resolve(full))) await visit(full);
+      else if (
+        entry.isFile()
+        && !fileExclusions.has(path.resolve(full))
+        && supportedInputExtensions.has(path.extname(entry.name).toLowerCase())
+      ) out.push(full);
     }
   }
   await visit(root);
