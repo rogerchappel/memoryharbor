@@ -11,6 +11,11 @@ Commands:
   inspect   Ingest local JSON/JSONL/Markdown/text traces and write a memory pack.
   search    Search an existing memory-manifest.json file.
 
+Options:
+  -o, --output <output-dir>       Directory for the generated memory pack.
+  -q, --query <term>              Search term for inspect or search.
+  --forget-after-days <days>      Positive retention duration in days (default: 90).
+
 Safety:
   Local files only. No network calls. Redacts common emails/tokens by default.
   Output inside the input directory is excluded from inspection.
