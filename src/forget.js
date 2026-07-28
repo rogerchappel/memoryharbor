@@ -1,7 +1,11 @@
 import { defaultForgetAfterDays } from './schema.js';
+import { MemoryHarborError } from './errors.js';
 
 export function buildForgettingPolicy(options = {}) {
-  const days = Number.isFinite(Number(options.forgetAfterDays)) ? Number(options.forgetAfterDays) : defaultForgetAfterDays;
+  const days = options.forgetAfterDays === undefined ? defaultForgetAfterDays : Number(options.forgetAfterDays);
+  if (!Number.isFinite(days) || days <= 0) {
+    throw new MemoryHarborError('forgetAfterDays must be a positive number');
+  }
   return {
     mode: 'local-manifest-only',
     forgetAfterDays: days,
