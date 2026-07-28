@@ -37,6 +37,11 @@ memoryharbor inspect ./fixtures/sample --output ./out --query citations
 memoryharbor search ./out/memory-manifest.json --query release --json
 ```
 
+`--output` and `--query` require values. Use `--forget-after-days <days>` on
+`inspect` to set a positive retention duration (the default is 90 days). Zero,
+negative, non-numeric, and missing durations are rejected before any output is
+written.
+
 Example output summary:
 
 ```json
