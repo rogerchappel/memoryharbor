@@ -19,10 +19,16 @@ It is inspired by the broader “agent memory” problem space and acknowledges 
 ## Install
 
 ```bash
-npm install -g memoryharbor
+git clone https://github.com/rogerchappel/memoryharbor.git
+npm install --global ./memoryharbor
 ```
 
-From a checkout:
+MemoryHarbor is not published to the npm registry. Packaged versions are
+distributed as tarballs attached to [GitHub releases](https://github.com/rogerchappel/memoryharbor/releases),
+and can also be installed by passing a downloaded `.tgz` file to
+`npm install --global`.
+
+To develop from the checkout instead:
 
 ```bash
 npm install
@@ -116,8 +122,8 @@ node src/cli.js inspect fixtures/sample --output .tmp/manual --query citations
 
 The npm package allowlist includes the runtime files plus the public support
 documents needed for release review: `README.md`, `LICENSE`, `SECURITY.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`.
-Run `npm run package:smoke` or `npm pack --dry-run` before publishing to
-confirm those files are still present in the tarball.
+Run `npm run package:smoke` before publishing to confirm those files are still
+present and that the packed CLI installs and starts from an isolated prefix.
 
 ## License
 
