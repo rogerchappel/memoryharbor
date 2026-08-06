@@ -8,8 +8,8 @@ Usage:
   memoryharbor --help
 
 Commands:
-  inspect   Ingest local JSON/JSONL/Markdown/text traces and write a memory pack.
-  search    Search an existing memory-manifest.json file.
+  inspect   Ingest exactly one input directory and write a memory pack.
+  search    Search exactly one existing memory-manifest.json file.
 
 Options:
   -o, --output <output-dir>       Directory for the generated memory pack.
