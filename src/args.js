@@ -34,5 +34,8 @@ export function parseArgs(argv) {
     else if (arg.startsWith('-')) throw new MemoryHarborError(`Unknown option: ${arg}`);
     else options._.push(arg);
   }
+  if ((command === 'inspect' || command === 'search') && options._.length > 1) {
+    throw new MemoryHarborError(`${command} accepts exactly one positional argument`);
+  }
   return { command, options };
 }
