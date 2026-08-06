@@ -38,3 +38,14 @@ test('parses valued options and positive retention', () => {
     }
   );
 });
+
+for (const [command, positional] of [
+  ['inspect', ['fixtures/sample', 'unexpected-extra']],
+  ['search', ['memory-manifest.json', 'unexpected-extra']]
+]) {
+  test(`${command} rejects surplus positional arguments`, () => {
+    assert.throws(() => parseArgs([command, ...positional]), {
+      message: `${command} accepts exactly one positional argument`
+    });
+  });
+}

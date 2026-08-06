@@ -42,6 +42,26 @@ test('invalid valued options fail without creating an output pack', async (t) =>
   }
 });
 
+test('surplus positional arguments fail before command side effects', async (t) => {
+  const cwd = await mkdtemp(path.join(os.tmpdir(), 'memoryharbor-cli-positional-'));
+  const output = path.join(cwd, 'pack');
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+
+  for (const [command, args] of [
+    ['inspect', [new URL('../fixtures/sample', import.meta.url).pathname, 'unexpected-extra', '--output', output]],
+    ['search', [path.join(cwd, 'missing-manifest.json'), 'unexpected-extra', '--query', 'release']]
+  ]) {
+    const result = spawnSync(process.execPath, [new URL('../src/cli.js', import.meta.url).pathname, command, ...args], {
+      cwd,
+      encoding: 'utf8'
+    });
+    assert.equal(result.status, 1, command);
+    assert.equal(result.stdout, '');
+    assert.equal(result.stderr, `memoryharbor: ${command} accepts exactly one positional argument\n`);
+    assert.equal(existsSync(output), false);
+  }
+});
+
 test('valid retention is written to the manifest', async (t) => {
   const cwd = await mkdtemp(path.join(os.tmpdir(), 'memoryharbor-cli-valid-'));
   const output = path.join(cwd, 'pack');
