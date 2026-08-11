@@ -48,7 +48,10 @@ memoryharbor search ./out/memory-manifest.json --query release --json
 negative, non-numeric, and missing durations are rejected before any output is
 written. Each command accepts exactly one positional argument: the input
 directory for `inspect`, or the manifest file for `search`. Extra positional
-arguments are rejected before files are read or an output pack is created.
+arguments and command-specific options used with the wrong command are rejected
+before files are read or an output pack is created. `inspect` accepts `--output`,
+`--query`, `--forget-after-days`, and `--no-redact`; `search` accepts `--query`
+and `--json`.
 
 Example output summary:
 
@@ -98,7 +101,9 @@ MemoryHarbor is deliberately quiet and local:
 - No credential scraping.
 - No hidden publishing.
 - No background daemon.
-- Redaction is enabled by default; use `--no-redact` only for trusted fixtures.
+- Redaction is enabled by default. The inspect-only `--no-redact` option disables
+  email and token redaction, so sensitive source content may be copied into the
+  generated manifest and report. Use it only with trusted fixtures and outputs.
 
 ## Validation
 
