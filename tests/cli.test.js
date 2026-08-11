@@ -15,10 +15,13 @@ test('cli prints package version', () => {
   assert.equal(result.stderr, '');
 });
 
-test('cli help documents version flag', () => {
+test('cli help documents version and safety-sensitive flags', () => {
   const result = spawnSync(process.execPath, ['src/cli.js', '--help'], { encoding: 'utf8' });
   assert.equal(result.status, 0);
   assert.match(result.stdout, /memoryharbor --version/);
+  assert.match(result.stdout, /--no-redact\s+Inspect only:/);
+  assert.match(result.stdout, /--no-redact may write sensitive source content/);
+  assert.match(result.stdout, /--json\s+Search only:/);
 });
 
 test('invalid valued options fail without creating an output pack', async (t) => {
