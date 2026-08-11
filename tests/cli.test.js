@@ -62,6 +62,28 @@ test('surplus positional arguments fail before command side effects', async (t) 
   }
 });
 
+test('inapplicable options fail before command side effects', async (t) => {
+  const cwd = await mkdtemp(path.join(os.tmpdir(), 'memoryharbor-cli-options-'));
+  const output = path.join(cwd, 'pack');
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+
+  for (const [command, args, option] of [
+    ['inspect', [new URL('../fixtures/sample', import.meta.url).pathname, '--json', '--output', output], '--json'],
+    ['search', [path.join(cwd, 'missing-manifest.json'), '--query', 'release', '--output', output], '--output'],
+    ['search', [path.join(cwd, 'missing-manifest.json'), '--query', 'release', '--forget-after-days', '30'], '--forget-after-days'],
+    ['search', [path.join(cwd, 'missing-manifest.json'), '--query', 'release', '--no-redact'], '--no-redact']
+  ]) {
+    const result = spawnSync(process.execPath, [new URL('../src/cli.js', import.meta.url).pathname, command, ...args], {
+      cwd,
+      encoding: 'utf8'
+    });
+    assert.equal(result.status, 1, `${command} ${option}`);
+    assert.equal(result.stdout, '');
+    assert.equal(result.stderr, `memoryharbor: ${option} is not valid for ${command}\n`);
+    assert.equal(existsSync(output), false);
+  }
+});
+
 test('valid retention is written to the manifest', async (t) => {
   const cwd = await mkdtemp(path.join(os.tmpdir(), 'memoryharbor-cli-valid-'));
   const output = path.join(cwd, 'pack');

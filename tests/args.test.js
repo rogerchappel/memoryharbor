@@ -39,6 +39,49 @@ test('parses valued options and positive retention', () => {
   );
 });
 
+test('accepts the complete inspect option set', () => {
+  assert.deepEqual(
+    parseArgs(['inspect', 'fixtures/sample', '--output', 'out', '--query', 'release', '--forget-after-days', '30', '--no-redact']),
+    {
+      command: 'inspect',
+      options: {
+        _: ['fixtures/sample'],
+        output: 'out',
+        query: 'release',
+        forgetAfterDays: 30,
+        redact: false
+      }
+    }
+  );
+});
+
+test('accepts the complete search option set', () => {
+  assert.deepEqual(
+    parseArgs(['search', 'memory-manifest.json', '--query', 'release', '--json']),
+    {
+      command: 'search',
+      options: {
+        _: ['memory-manifest.json'],
+        query: 'release',
+        json: true
+      }
+    }
+  );
+});
+
+for (const [command, option, value] of [
+  ['inspect', '--json'],
+  ['search', '--output', 'out'],
+  ['search', '--forget-after-days', '30'],
+  ['search', '--no-redact']
+]) {
+  test(`${command} rejects inapplicable ${option}`, () => {
+    assert.throws(() => parseArgs([command, 'input', option, ...(value ? [value] : [])]), {
+      message: `${option} is not valid for ${command}`
+    });
+  });
+}
+
 for (const [command, positional] of [
   ['inspect', ['fixtures/sample', 'unexpected-extra']],
   ['search', ['memory-manifest.json', 'unexpected-extra']]
