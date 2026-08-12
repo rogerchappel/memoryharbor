@@ -19,6 +19,7 @@ test('cli help documents version and safety-sensitive flags', () => {
   const result = spawnSync(process.execPath, ['src/cli.js', '--help'], { encoding: 'utf8' });
   assert.equal(result.status, 0);
   assert.match(result.stdout, /memoryharbor --version/);
+  assert.match(result.stdout, /Each option may be specified at most once/);
   assert.match(result.stdout, /--no-redact\s+Inspect only:/);
   assert.match(result.stdout, /--no-redact may write sensitive source content/);
   assert.match(result.stdout, /--json\s+Search only:/);
