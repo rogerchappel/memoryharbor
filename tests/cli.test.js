@@ -87,6 +87,29 @@ test('inapplicable options fail before command side effects', async (t) => {
   }
 });
 
+test('duplicate options fail before command side effects', async (t) => {
+  const cwd = await mkdtemp(path.join(os.tmpdir(), 'memoryharbor-cli-duplicates-'));
+  const output = path.join(cwd, 'pack');
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+
+  for (const [command, args, option] of [
+    ['inspect', [new URL('../fixtures/sample', import.meta.url).pathname, '--output', output, '-o', `${output}-second`], '--output'],
+    ['inspect', [new URL('../fixtures/sample', import.meta.url).pathname, '--output', output, '--no-redact', '--no-redact'], '--no-redact'],
+    ['search', [path.join(cwd, 'missing-manifest.json'), '--query', 'release', '-q', 'citations'], '--query'],
+    ['search', [path.join(cwd, 'missing-manifest.json'), '--query', 'release', '--json', '--json'], '--json']
+  ]) {
+    const result = spawnSync(process.execPath, [new URL('../src/cli.js', import.meta.url).pathname, command, ...args], {
+      cwd,
+      encoding: 'utf8'
+    });
+    assert.equal(result.status, 1, `${command} ${option}`);
+    assert.equal(result.stdout, '');
+    assert.equal(result.stderr, `memoryharbor: ${option} may only be specified once\n`);
+    assert.equal(existsSync(output), false);
+    assert.equal(existsSync(`${output}-second`), false);
+  }
+});
+
 test('valid retention is written to the manifest', async (t) => {
   const cwd = await mkdtemp(path.join(os.tmpdir(), 'memoryharbor-cli-valid-'));
   const output = path.join(cwd, 'pack');
