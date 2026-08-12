@@ -5,6 +5,12 @@ export function parseArgs(argv) {
   const command = args.shift() ?? 'help';
   const options = { _: [] };
   const suppliedOptions = new Set();
+  const recordOption = (option) => {
+    if (suppliedOptions.has(option)) {
+      throw new MemoryHarborError(`${option} may only be specified once`);
+    }
+    suppliedOptions.add(option);
+  };
   const takeValue = (index, option) => {
     const value = args[index + 1];
     if (value === undefined || value.startsWith('-')) {
@@ -15,15 +21,15 @@ export function parseArgs(argv) {
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
     if (arg === '--output' || arg === '-o') {
-      suppliedOptions.add('--output');
+      recordOption('--output');
       options.output = takeValue(index++, arg);
     }
     else if (arg === '--query' || arg === '-q') {
-      suppliedOptions.add('--query');
+      recordOption('--query');
       options.query = takeValue(index++, arg);
     }
     else if (arg === '--forget-after-days') {
-      suppliedOptions.add(arg);
+      recordOption(arg);
       const value = args[index + 1];
       if (value === undefined || (value.startsWith('-') && !/^-\d/.test(value))) {
         throw new MemoryHarborError(`${arg} requires a value`);
@@ -36,15 +42,21 @@ export function parseArgs(argv) {
       options.forgetAfterDays = days;
     }
     else if (arg === '--no-redact') {
-      suppliedOptions.add(arg);
+      recordOption(arg);
       options.redact = false;
     }
     else if (arg === '--json') {
-      suppliedOptions.add(arg);
+      recordOption(arg);
       options.json = true;
     }
-    else if (arg === '--help' || arg === '-h') options.help = true;
-    else if (arg === '--version' || arg === '-v') options.version = true;
+    else if (arg === '--help' || arg === '-h') {
+      recordOption('--help');
+      options.help = true;
+    }
+    else if (arg === '--version' || arg === '-v') {
+      recordOption('--version');
+      options.version = true;
+    }
     else if (arg.startsWith('-')) throw new MemoryHarborError(`Unknown option: ${arg}`);
     else options._.push(arg);
   }

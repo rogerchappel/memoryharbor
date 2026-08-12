@@ -24,6 +24,23 @@ for (const value of ['NaN', '0', '-1']) {
   });
 }
 
+for (const [option, args] of [
+  ['--output', ['--output', 'first', '--output', 'second']],
+  ['--output', ['--output', 'first', '-o', 'second']],
+  ['--query', ['-q', 'first', '--query', 'second']],
+  ['--forget-after-days', ['--forget-after-days', '30', '--forget-after-days', '60']],
+  ['--no-redact', ['--no-redact', '--no-redact']],
+  ['--json', ['--json', '--json']],
+  ['--help', ['--help', '-h']],
+  ['--version', ['-v', '--version']]
+]) {
+  test(`rejects duplicate logical option ${args.join(' ')}`, () => {
+    assert.throws(() => parseArgs(['inspect', 'fixtures/sample', ...args]), {
+      message: `${option} may only be specified once`
+    });
+  });
+}
+
 test('parses valued options and positive retention', () => {
   assert.deepEqual(
     parseArgs(['inspect', 'fixtures/sample', '--output', 'out', '--query', 'release', '--forget-after-days', '30']),
