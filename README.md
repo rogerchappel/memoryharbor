@@ -46,7 +46,9 @@ memoryharbor search ./out/memory-manifest.json --query release --json
 `--output` and `--query` require values. Use `--forget-after-days <days>` on
 `inspect` to set a positive retention duration (the default is 90 days). Zero,
 negative, non-numeric, and missing durations are rejected before any output is
-written. Each command accepts exactly one positional argument: the input
+written. Each option may be specified at most once; short and long forms such
+as `-o` and `--output` count as the same option. Each command accepts exactly
+one positional argument: the input
 directory for `inspect`, or the manifest file for `search`. Extra positional
 arguments and command-specific options used with the wrong command are rejected
 before files are read or an output pack is created. `inspect` accepts `--output`,
