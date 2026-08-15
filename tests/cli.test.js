@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -129,4 +129,53 @@ test('valid retention is written to the manifest', async (t) => {
   assert.equal(result.status, 0, result.stderr);
   const manifest = JSON.parse(await readFile(path.join(output, 'memory-manifest.json'), 'utf8'));
   assert.equal(manifest.forgettingPolicy.forgetAfterDays, 30);
+});
+
+test('inspect rejects invalid JSON transcript shapes without writing a pack', async (t) => {
+  const cwd = await mkdtemp(path.join(os.tmpdir(), 'memoryharbor-cli-json-shape-'));
+  const input = path.join(cwd, 'input');
+  const output = path.join(cwd, 'pack');
+  await mkdir(input);
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+
+  for (const [name, text] of [['missing', '{}'], ['mistyped', '{"messages":{}}']]) {
+    await writeFile(path.join(input, 'chat.json'), text);
+    const result = spawnSync(process.execPath, [new URL('../src/cli.js', import.meta.url).pathname, 'inspect', input, '--output', output], { encoding: 'utf8' });
+    assert.equal(result.status, 1, name);
+    assert.match(result.stderr, /chat\.json must contain a messages array/);
+    assert.equal(existsSync(output), false);
+  }
+});
+
+test('inspect accepts empty JSON and cites JSONL messages by physical line', async (t) => {
+  const cwd = await mkdtemp(path.join(os.tmpdir(), 'memoryharbor-cli-jsonl-lines-'));
+  const input = path.join(cwd, 'input');
+  const output = path.join(cwd, 'pack');
+  await mkdir(input);
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+  await writeFile(path.join(input, 'empty.json'), '{"messages":[]}');
+  await writeFile(path.join(input, 'chat.jsonl'), '{"role":"user","content":"first"}\n\n{"role":"assistant","content":"third"}\n');
+
+  const result = spawnSync(process.execPath, [new URL('../src/cli.js', import.meta.url).pathname, 'inspect', input, '--output', output], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  const manifest = JSON.parse(await readFile(path.join(output, 'memory-manifest.json'), 'utf8'));
+  assert.equal(manifest.counters.files, 2);
+  assert.deepEqual(manifest.messages.map(({ id, index, citation }) => ({ id, index, citation })), [
+    { id: `${path.join(input, 'chat.jsonl')}#1`, index: 0, citation: 'chat.jsonl#message-1' },
+    { id: `${path.join(input, 'chat.jsonl')}#3`, index: 2, citation: 'chat.jsonl#message-3' }
+  ]);
+});
+
+test('inspect reports the physical line for malformed JSONL', async (t) => {
+  const cwd = await mkdtemp(path.join(os.tmpdir(), 'memoryharbor-cli-jsonl-invalid-'));
+  const input = path.join(cwd, 'input');
+  const output = path.join(cwd, 'pack');
+  await mkdir(input);
+  await writeFile(path.join(input, 'chat.jsonl'), '{"role":"user"}\n\nnot-json\n');
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+
+  const result = spawnSync(process.execPath, [new URL('../src/cli.js', import.meta.url).pathname, 'inspect', input, '--output', output], { encoding: 'utf8' });
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Invalid JSONL on line 3/);
+  assert.equal(existsSync(output), false);
 });
