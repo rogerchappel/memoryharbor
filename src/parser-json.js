@@ -8,14 +8,18 @@ export function parseJsonTranscript(text, sourcePath) {
     throw new MemoryHarborError(`Invalid JSON in ${sourcePath}`, { cause: error.message });
   }
   assertObject(data, 'transcript');
-  const messages = Array.isArray(data.messages) ? data.messages : [];
+  if (!Array.isArray(data.messages)) {
+    throw new MemoryHarborError(`JSON transcript in ${sourcePath} must contain a messages array`);
+  }
+  const messages = data.messages;
   return messages.map((message, index) => normalizeMessage(message, sourcePath, index));
 }
 
 export function parseJsonlTranscript(text, sourcePath) {
-  return text.split(/\r?\n/).filter(Boolean).map((line, index) => {
+  return text.split(/\r?\n/).flatMap((line, index) => {
+    if (line.trim() === '') return [];
     try {
-      return normalizeMessage(JSON.parse(line), sourcePath, index);
+      return [normalizeMessage(JSON.parse(line), sourcePath, index)];
     } catch (error) {
       throw new MemoryHarborError(`Invalid JSONL on line ${index + 1} in ${sourcePath}`, { cause: error.message });
     }

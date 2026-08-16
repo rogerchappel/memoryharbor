@@ -82,7 +82,9 @@ directory) so repeated inspections do not re-ingest prior output.
 
 ## Input shapes
 
-JSON transcripts can use `messages` with `role`, `content`, `createdAt`, and `toolCalls` fields. JSONL files are one message per line. Markdown/text files split on blank lines and infer a role from prefixes like `user:` or `assistant:`.
+JSON transcripts must be an object with a `messages` array; an empty array is valid. Each message can use `role`, `content`, `createdAt`, and `toolCalls` fields. A missing or non-array `messages` value is rejected with the source filename.
+
+JSONL files are one message per line. Blank lines are skipped, while message IDs, indices, citations, and parse errors retain physical line positions (for example, a message after one blank line is `#message-3`). Markdown/text files split on blank lines and infer a role from prefixes like `user:` or `assistant:`.
 ## CLI Help Smoke
 
 Confirm the packaged command starts and prints its help text before relying on a release tarball or downstream automation:
