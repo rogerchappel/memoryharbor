@@ -18,6 +18,10 @@ It is inspired by the broader “agent memory” problem space and acknowledges 
 
 ## Install
 
+MemoryHarbor supports Node.js 20 and later. The full release-readiness suite is
+tested on Node.js 20 (the minimum supported runtime) and Node.js 22 (the current
+release runtime).
+
 ```bash
 git clone https://github.com/rogerchappel/memoryharbor.git
 npm install --global ./memoryharbor
