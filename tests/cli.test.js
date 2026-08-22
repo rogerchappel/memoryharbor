@@ -131,6 +131,36 @@ test('valid retention is written to the manifest', async (t) => {
   assert.equal(manifest.forgettingPolicy.forgetAfterDays, 30);
 });
 
+test('search validates manifests and accepts generated output', async (t) => {
+  const cwd = await mkdtemp(path.join(os.tmpdir(), 'memoryharbor-cli-search-manifest-'));
+  const output = path.join(cwd, 'pack');
+  const cli = new URL('../src/cli.js', import.meta.url).pathname;
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+
+  const malformed = [
+    ['empty object', {}, 'manifest.messages must be an array'],
+    ['non-array messages', { messages: {} }, 'manifest.messages must be an array'],
+    ['missing citation', { messages: [{ role: 'user', content: 'hello' }] }, 'manifest.messages[0].citation must be a non-empty string'],
+    ['invalid role', { messages: [{ citation: 'chat.json#message-1', role: 7, content: 'hello' }] }, 'manifest.messages[0].role must be a non-empty string'],
+    ['invalid content', { messages: [{ citation: 'chat.json#message-1', role: 'user', content: null }] }, 'manifest.messages[0].content must be a string']
+  ];
+
+  for (const [name, manifest, diagnostic] of malformed) {
+    const manifestPath = path.join(cwd, `${name.replaceAll(' ', '-')}.json`);
+    await writeFile(manifestPath, JSON.stringify(manifest));
+    const result = spawnSync(process.execPath, [cli, 'search', manifestPath, '--query', 'hello'], { encoding: 'utf8' });
+    assert.equal(result.status, 1, name);
+    assert.equal(result.stdout, '');
+    assert.equal(result.stderr, `memoryharbor: ${diagnostic}\n`);
+  }
+
+  const inspectResult = spawnSync(process.execPath, [cli, 'inspect', new URL('../fixtures/sample', import.meta.url).pathname, '--output', output], { encoding: 'utf8' });
+  assert.equal(inspectResult.status, 0, inspectResult.stderr);
+  const searchResult = spawnSync(process.execPath, [cli, 'search', path.join(output, 'memory-manifest.json'), '--query', 'release', '--json'], { encoding: 'utf8' });
+  assert.equal(searchResult.status, 0, searchResult.stderr);
+  assert.ok(JSON.parse(searchResult.stdout).hits.length > 0);
+});
+
 test('inspect rejects invalid JSON transcript shapes without writing a pack', async (t) => {
   const cwd = await mkdtemp(path.join(os.tmpdir(), 'memoryharbor-cli-json-shape-'));
   const input = path.join(cwd, 'input');

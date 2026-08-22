@@ -19,6 +19,21 @@ test('inspect builds a cited local-first manifest', async (t) => {
   assert.ok(searchManifest(manifest, 'citations').length >= 1);
 });
 
+test('search rejects malformed manifests with field-specific diagnostics', () => {
+  const invalid = [
+    [{}, 'manifest.messages must be an array'],
+    [{ messages: {} }, 'manifest.messages must be an array'],
+    [{ messages: [null] }, 'manifest.messages[0] must be an object'],
+    [{ messages: [{}] }, 'manifest.messages[0].citation must be a non-empty string'],
+    [{ messages: [{ citation: 'chat.json#message-1' }] }, 'manifest.messages[0].role must be a non-empty string'],
+    [{ messages: [{ citation: 'chat.json#message-1', role: 'user' }] }, 'manifest.messages[0].content must be a string']
+  ];
+
+  for (const [manifest, message] of invalid) {
+    assert.throws(() => searchManifest(manifest, 'hello'), { message });
+  }
+});
+
 test('inspect does not re-ingest a nested output directory', async (t) => {
   const input = await fs.mkdtemp(path.join(os.tmpdir(), 'memoryharbor-nested-output-'));
   const output = path.join(input, 'generated', 'memory-pack');
