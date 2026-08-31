@@ -68,11 +68,32 @@ Example output summary:
 ```json
 {
   "ok": true,
+  "outputDir": "./out",
   "manifestPath": "./out/memory-manifest.json",
   "reportPath": "./out/memory-report.md",
-  "counters": { "files": 3, "messages": 6, "toolCalls": 2 }
+  "counters": {
+    "files": 3,
+    "messages": 6,
+    "toolCalls": 2,
+    "artifacts": 0,
+    "bytes": 944,
+    "redactions": 1
+  },
+  "query": "citations",
+  "hits": [
+    {
+      "score": 1,
+      "citation": "chat.json#message-2",
+      "role": "assistant",
+      "content": "I will build a local-first memory pack with citations and a forgetting policy."
+    }
+  ]
 }
 ```
+
+`inspect` always writes exactly one JSON document to standard output. When
+`--query` is present, that document adds `query` and `hits` to the same envelope;
+without a query, those two fields are omitted.
 
 ## Library use
 
