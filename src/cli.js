@@ -23,11 +23,15 @@ async function main() {
     const input = options._[0];
     if (!input) throw new Error('inspect requires <input-dir>');
     const { manifest, outputDir } = await inspect(input, options.output, options);
-    const payload = { ok: true, outputDir, manifestPath: `${outputDir}/memory-manifest.json`, reportPath: `${outputDir}/memory-report.md`, counters: manifest.counters };
+    const payload = {
+      ok: true,
+      outputDir,
+      manifestPath: `${outputDir}/memory-manifest.json`,
+      reportPath: `${outputDir}/memory-report.md`,
+      counters: manifest.counters,
+      ...(options.query ? { query: options.query, hits: searchManifest(manifest, options.query) } : {})
+    };
     process.stdout.write(`${JSON.stringify(payload, null, 2)}\n`);
-    if (options.query) {
-      process.stdout.write(`${JSON.stringify({ query: options.query, hits: searchManifest(manifest, options.query) }, null, 2)}\n`);
-    }
     return;
   }
   if (command === 'search') {
