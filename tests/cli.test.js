@@ -131,6 +131,44 @@ test('valid retention is written to the manifest', async (t) => {
   assert.equal(manifest.forgettingPolicy.forgetAfterDays, 30);
 });
 
+test('inspect emits one JSON envelope with and without a query', async (t) => {
+  const cwd = await mkdtemp(path.join(os.tmpdir(), 'memoryharbor-cli-envelope-'));
+  const cli = new URL('../src/cli.js', import.meta.url).pathname;
+  const input = new URL('../fixtures/sample', import.meta.url).pathname;
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+
+  for (const query of [undefined, 'citations']) {
+    const output = path.join(cwd, query ? 'with-query' : 'without-query');
+    const args = [cli, 'inspect', input, '--output', output];
+    if (query) args.push('--query', query);
+
+    const result = spawnSync(process.execPath, args, { cwd, encoding: 'utf8' });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stderr, '');
+
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.ok, true);
+    assert.equal(payload.outputDir, output);
+    assert.equal(payload.manifestPath, `${output}/memory-manifest.json`);
+    assert.equal(payload.reportPath, `${output}/memory-report.md`);
+    assert.deepEqual(payload.counters, {
+      files: 3,
+      messages: 6,
+      toolCalls: 2,
+      artifacts: 0,
+      bytes: 944,
+      redactions: 1
+    });
+    if (query) {
+      assert.equal(payload.query, query);
+      assert.ok(payload.hits.length > 0);
+    } else {
+      assert.equal('query' in payload, false);
+      assert.equal('hits' in payload, false);
+    }
+  }
+});
+
 test('search validates manifests and accepts generated output', async (t) => {
   const cwd = await mkdtemp(path.join(os.tmpdir(), 'memoryharbor-cli-search-manifest-'));
   const output = path.join(cwd, 'pack');
