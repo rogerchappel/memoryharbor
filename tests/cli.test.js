@@ -131,6 +131,34 @@ test('valid retention is written to the manifest', async (t) => {
   assert.equal(manifest.forgettingPolicy.forgetAfterDays, 30);
 });
 
+test('inspect output envelope preserves documented fields and paths', async (t) => {
+  const cwd = await mkdtemp(path.join(os.tmpdir(), 'memoryharbor-cli-envelope-contract-'));
+  const cli = new URL('../src/cli.js', import.meta.url).pathname;
+  const input = new URL('../fixtures/sample', import.meta.url).pathname;
+  const output = path.join(cwd, 'pack');
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+
+  const result = spawnSync(process.execPath, [cli, 'inspect', input, '--output', output], { cwd, encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stderr, '');
+  const envelope = JSON.parse(result.stdout);
+  assert.deepEqual(Object.keys(envelope), ['ok', 'outputDir', 'manifestPath', 'reportPath', 'counters']);
+  assert.equal(envelope.ok, true);
+  assert.equal(envelope.outputDir, output);
+  assert.equal(envelope.manifestPath, path.join(output, 'memory-manifest.json'));
+  assert.equal(envelope.reportPath, path.join(output, 'memory-report.md'));
+  assert.deepEqual(envelope.counters, {
+    files: 3,
+    messages: 6,
+    toolCalls: 2,
+    artifacts: 0,
+    bytes: 944,
+    redactions: 1
+  });
+  assert.equal(JSON.parse(await readFile(envelope.manifestPath, 'utf8')).counters.files, envelope.counters.files);
+  assert.equal((await readFile(envelope.reportPath, 'utf8')).length > 0, true);
+});
+
 test('inspect emits one JSON envelope with and without a query', async (t) => {
   const cwd = await mkdtemp(path.join(os.tmpdir(), 'memoryharbor-cli-envelope-'));
   const cli = new URL('../src/cli.js', import.meta.url).pathname;
