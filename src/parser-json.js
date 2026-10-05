@@ -18,11 +18,13 @@ export function parseJsonTranscript(text, sourcePath) {
 export function parseJsonlTranscript(text, sourcePath) {
   return text.split(/\r?\n/).flatMap((line, index) => {
     if (line.trim() === '') return [];
+    let raw;
     try {
-      return [normalizeMessage(JSON.parse(line), sourcePath, index)];
+      raw = JSON.parse(line);
     } catch (error) {
       throw new MemoryHarborError(`Invalid JSONL on line ${index + 1} in ${sourcePath}`, { cause: error.message });
     }
+    return [normalizeMessage(raw, sourcePath, index)];
   });
 }
 

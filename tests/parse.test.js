@@ -35,6 +35,15 @@ test('JSONL blank lines preserve physical source indices and malformed line loca
   });
 });
 
+test('JSONL reports valid non-object JSON as message validation, not syntax failure', () => {
+  assert.throws(() => parseJsonlTranscript('[]', 'invalid-message.jsonl'), {
+    message: 'message 1 must be an object'
+  });
+  assert.throws(() => parseJsonlTranscript('{bad}', 'broken.jsonl'), {
+    message: 'Invalid JSONL on line 1 in broken.jsonl'
+  });
+});
+
 test('CLI help exits cleanly with usage text', async () => {
   const { stdout } = await execFileAsync(process.execPath, ['src/cli.js', '--help'], { cwd: process.cwd() });
 
